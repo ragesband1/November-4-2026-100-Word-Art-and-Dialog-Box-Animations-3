@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>100 Word Art and Dialog Box Animations</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 25px;
+  font-family: Arial, sans-serif;
+  color: white;
+  background: #101020;
+  text-align: center;
+}
+
+h1 {
+  color: #fff;
+  text-shadow: 0 0 15px cyan, 0 0 25px magenta;
+}
+
+.instructions {
+  color: #ddd;
+  margin-bottom: 20px;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+button {
+  cursor: pointer;
+  border: 1px solid #ffffff66;
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: white;
+  background: #29294d;
+  font-size: 15px;
+}
+
+.control-button {
+  background: #5141a0;
+  font-weight: bold;
+}
+
+#gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 13px;
+  max-width: 1200px;
+  margin: 25px auto;
+}
+
+.art-button {
+  min-height: 75px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #29295b, #652c83);
+  border: 2px solid #a98cff;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.art-button span {
+  display: inline-block;
+}
+
+/* Permanent animation stays after mouse leaves */
+.latched {
+  animation-iteration-count: infinite !important;
+  animation-timing-function: ease-in-out !important;
+  animation-fill-mode: both !important;
+}
+
+/* Dialog */
+dialog {
+  width: min(650px, 94vw);
+  color: white;
+  background: #17172d;
+  border: 2px solid #b68cff;
+  border-radius: 18px;
+  padding: 25px;
+  box-shadow: 0 0 30px #9b59ff;
+}
+
+dialog::backdrop {
+  background: #000b;
+}
+
+#dialogTitle {
+  color: #ffdc7a;
+  font-size: 27px;
+  margin-bottom: 15px;
+}
+
+#dialogDefinition {
+  font-size: 17px;
+  line-height: 1.6;
+  margin: 15px 0;
+}
+
+#dialogNumber {
+  color: #aaa;
+}
+
+.dialog-controls {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.dialog-controls button {
+  background: #5141a0;
+}
+
+.hover-hint {
+  color: #bdb4e8;
+  font-size: 13px;
+}
+
+/* Generated animation effects */
+</style>
+</head>
+
+<body>
+
+<h1>100 Word Art and Dialog Box Animations</h1>
+
+<p class="instructions">
+  Hover over any button or text to start its permanent animation and hear its definition.
+  Once activated, the animation continues even after the mouse leaves.
+</p>
+
+<div class="controls">
+  <button class="control-button" onclick="stopAudio()">Stop Audio</button>
+  <button class="control-button" onclick="replayAudio()">Replay Audio</button>
+  <button class="control-button" onclick="restartAnimations()">Restart Animation</button>
+</div>
+
+<div id="gallery"></div>
+
+<dialog id="animationDialog">
+  <div id="dialogNumber"></div>
+  <h2 id="dialogTitle"></h2>
+  <p id="dialogDefinition"></p>
+  <p class="hover-hint">
+    Hover over the title, description, or dialog box to activate its permanent animation and hear its definition.
+  </p>
+
+  <div class="dialog-controls">
+    <button onclick="replayAudio()">Replay Audio</button>
+    <button onclick="stopAudio()">Stop Audio</button>
+    <button onclick="restartAnimations()">Restart Animation</button>
+    <button onclick="closeDialog()">Close</button>
+  </div>
+</dialog>
+
+<script>
+const motions = [
+  {
+    name: "Bounce",
+    description: "Moves up and down repeatedly in a bouncing motion.",
+    frames: [
+      "translateY(0)",
+      "translateY(-15px)",
+      "translateY(0)",
+      "translateY(-8px)",
+      "translateY(0)"
+    ]
+  },
+  {
+    name: "Rotate",
+    description: "Rotates continuously from side to side.",
+    frames: [
+      "rotate(0deg)",
+      "rotate(15deg)",
+      "rotate(0deg)",
+      "rotate(-15deg)",
+      "rotate(0deg)"
+    ]
+  },
+  {
+    name: "Shake",
+    description: "Shakes quickly from left to right.",
+    frames: [
+      "translateX(0)",
+      "translateX(-8px)",
+      "translateX(8px)",
+      "translateX(-8px)",
+      "translateX(0)"
+    ]
+  },
+  {
+    name: "Pulse",
+    description: "Expands and shrinks repeatedly.",
+    frames: [
+      "scale(1)",
+      "scale(1.15)",
+      "scale(1)",
+      "scale(.94)",
+      "scale(1)"
+    ]
+  },
+  {
+    name: "Swing",
+    description: "Swings like a hanging object.",
+    frames: [
+      "rotate(0deg)",
+      "rotate(12deg)",
+      "rotate(0deg)",
+      "rotate(-12deg)",
+      "rotate(0deg)"
+    ]
+  },
+  {
+    name: "Slide",
+    description: "Slides horizontally and returns to its starting position.",
+    frames: [
+      "translateX(0)",
+      "translateX(12px)",
+      "translateX(0)",
+      "translateX(-12px)",
+      "translateX(0)"
+    ]
+  },
+  {
+    name: "Flip",
+    description: "Flips forward and backward using a three-dimensional rotation.",
+    frames: [
+      "perspective(400px) rotateY(0deg)",
+      "perspective(400px) rotateY(180deg)",
+      "perspective(400px) rotateY(0deg)",
+      "perspective(400px) rotateX(180deg)",
+      "perspective(400px) rotateX(0deg)"
+    ]
+  },
+  {
+    name: "Float",
+    description: "Floats gently up and down.",
+    frames: [
+      "translateY(0)",
+      "translateY(-10px)",
+      "translateY(0)",
+      "translateY(8px)",
+      "translateY(0)"
+    ]
+  },
+  {
+    name: "Skew",
+    description: "Tilts and skews in alternating directions.",
+    frames: [
+      "skew(0deg, 0deg)",
+      "skew(8deg, 3deg)",
+      "skew(0deg, 0deg)",
+      "skew(-8deg, -3deg)",
+      "skew(0deg, 0deg)"
+    ]
+  },
+  {
+    name: "Zoom",
+    description: "Zooms in and out continuously.",
+    frames: [
+      "scale(1)",
+      "scale(1.2)",
+      "scale(1)",
+      "scale(.9)",
+      "scale(1)"
+    ]
+  }
+];
+
+const styles = [
+  "Neon Glow",
+  "Rainbow Glow",
+  "Golden Shine",
+  "Electric Shadow",
+  "Soft Blur",
+  "Bright Flash",
+  "Color Shift",
+  "Shadow Pulse",
+  "Dream Glow",
+  "Crystal Shine"
+];
+
+const styleDescriptions = [
+  "with a glowing neon appearance",
+  "with changing rainbow colors",
+  "with a golden glowing appearance",
+  "with a bright electric shadow",
+  "with a soft blurred glow",
+  "with alternating brightness",
+  "with changing color filters",
+  "with a pulsing shadow",
+  "with a dreamy colored glow",
+  "with a crystal-like shine"
+];
+
+const colors = [
+  "#00ffff",
+  "#ff4de1",
+  "#ffd700",
+  "#7cff00",
+  "#ff704d",
+  "#a78bfa",
+  "#ffffff",
+  "#00ff99",
+  "#ff99cc",
+  "#66aaff"
+];
+
+const animations = [];
+
+for (let i = 0; i < 100; i++) {
+  const motion = motions[Math.floor(i / 10)];
+  const styleIndex = i % 10;
+
+  animations.push({
+    name: motion.name + " " + styles[styleIndex],
+    definition:
+      motion.description + " The text also displays " +
+      styleDescriptions[styleIndex] + ".",
+    frames: motion.frames,
+    color: colors[styleIndex],
+    index: i
+  });
+}
+
+/* Create unique keyframes for all 100 effects */
+const generatedCSS = document.createElement("style");
+
+let css = "";
+
+animations.forEach((item, i) => {
+  css += `
+    @keyframes effect${i} {
+      0% {
+        transform: ${item.frames[0]};
+        color: white;
+        text-shadow: 0 0 2px ${item.color};
+        filter: brightness(1);
+      }
+      25% {
+        transform: ${item.frames[1]};
+        color: ${item.color};
+        text-shadow: 0 0 12px ${item.color}, 0 0 22px ${item.color};
+        filter: brightness(1.4);
+      }
+      50% {
+        transform: ${item.frames[2]};
+        color: white;
+        text-shadow: 0 0 8px ${item.color};
+        filter: brightness(1.1);
+      }
+      75% {
+        transform: ${item.frames[3]};
+        color: ${item.color};
+        text-shadow: 0 0 15px ${item.color};
+        filter: brightness(1.5);
+      }
+      100% {
+        transform: ${item.frames[4]};
+        color: white;
+        text-shadow: 0 0 2px ${item.color};
+        filter: brightness(1);
+      }
+    }
+
+    .effect-${i}.latched {
+      animation-name: effect${i};
+      animation-duration: ${1.1 + (i % 5) * 0.25}s;
+    }
+  `;
+});
+
+generatedCSS.textContent = css;
+document.head.appendChild(generatedCSS);
+
+const gallery = document.getElementById("gallery");
+const dialog = document.getElementById("animationDialog");
+const dialogNumber = document.getElementById("dialogNumber");
+const dialogTitle = document.getElementById("dialogTitle");
+const dialogDefinition = document.getElementById("dialogDefinition");
+
+let selectedIndex = 0;
+let lastSpokenText = "";
+let lastSpokenElement = null;
+
+/* Create exactly 100 buttons */
+animations.forEach((item, i) => {
+  const button = document.createElement("button");
+  button.className = "art-button";
+  button.innerHTML = `
+    <span>BUTTON ${i + 1}<br>${item.name}</span>
+  `;
+
+  const label = button.querySelector("span");
+
+  button.addEventListener("mouseenter", () => {
+    activatePermanent(button, i);
+    activatePermanent(label, i);
+    speakElement(button, item.definition);
+  });
+
+  label.addEventListener("mouseenter", () => {
+    activatePermanent(label, i);
+    speakElement(label, item.definition);
+  });
+
+  button.addEventListener("click", () => {
+    openAnimation(i);
+  });
+
+  gallery.appendChild(button);
+});
+
+/* Add permanent animation class.
+   No mouseleave event removes it. */
+function activatePermanent(element, index) {
+  element.classList.add("latched");
+  element.classList.add("effect-" + index);
+}
+
+/* Speech */
+function speakElement(element, text) {
+  if (!("speechSynthesis" in window)) return;
+
+  speechSynthesis.cancel();
+
+  lastSpokenText = text;
+  lastSpokenElement = element;
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = 0.95;
+  utterance.pitch = 1;
+  utterance.volume = 1;
+
+  speechSynthesis.speak(utterance);
+}
+
+function replayAudio() {
+  if (lastSpokenText) {
+    speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(lastSpokenText);
+    utterance.rate = 0.95;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+    speechSynthesis.speak(utterance);
+  }
+}
+
+function stopAudio() {
+  if ("speechSynthesis" in window) {
+    speechSynthesis.cancel();
+  }
+}
+
+/* Open selected animation */
+function openAnimation(index) {
+  selectedIndex = index;
+  const item = animations[index];
+
+  dialogNumber.textContent = "ANIMATION " + (index + 1) + " OF 100";
+  dialogTitle.textContent = item.name;
+  dialogDefinition.textContent = item.definition;
+
+  /* Dialog and its text animate immediately */
+  activatePermanent(dialog, index);
+  activatePermanent(dialogTitle, index);
+  activatePermanent(dialogDefinition, index);
+  activatePermanent(dialogNumber, index);
+
+  if (!dialog.open) {
+    dialog.showModal();
+  }
+
+  speakElement(dialogTitle, item.definition);
+}
+
+/* Hovering dialog itself */
+dialog.addEventListener("mouseenter", (event) => {
+  if (event.target !== dialog) return;
+
+  activatePermanent(dialog, selectedIndex);
+  speakElement(dialog, animations[selectedIndex].definition);
+});
+
+/* Hovering dialog title */
+dialogTitle.addEventListener("mouseenter", () => {
+  activatePermanent(dialogTitle, selectedIndex);
+  speakElement(dialogTitle, animations[selectedIndex].definition);
+});
+
+/* Hovering dialog description */
+dialogDefinition.addEventListener("mouseenter", () => {
+  activatePermanent(dialogDefinition, selectedIndex);
+  speakElement(dialogDefinition, animations[selectedIndex].definition);
+});
+
+/* Hovering dialog number */
+dialogNumber.addEventListener("mouseenter", () => {
+  activatePermanent(dialogNumber, selectedIndex);
+  speakElement(dialogNumber, animations[selectedIndex].definition);
+});
+
+function closeDialog() {
+  stopAudio();
+  dialog.close();
+}
+
+/* Restart clears all permanent hover animations */
+function restartAnimations() {
+  stopAudio();
+
+  document.querySelectorAll(".latched").forEach(element => {
+    element.classList.remove("latched");
+
+    [...element.classList].forEach(className => {
+      if (className.startsWith("effect-")) {
+        element.classList.remove(className);
+      }
+    });
+  });
+
+  if (dialog.open) {
+    dialog.close();
+  }
+
+  lastSpokenText = "";
+  lastSpokenElement = null;
+}
+</script>
+
+</body>
+</html>
